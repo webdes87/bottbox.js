@@ -344,7 +344,7 @@
     var defaults;
     var dialog;
     var form;
-    var input;
+    var $input;
     var shouldShow;
     var inputOptions;
 
@@ -397,11 +397,11 @@
         case "time":
         case "number":
         case "password":
-          value = input.val();
+          value = $input.val();
           break;
 
         case "checkbox":
-          var checkedItems = input.find("input:checked");
+          var checkedItems = $input.find("input:checked");
 
           // we assume that checkboxes are always multiple,
           // hence we default to an empty array
@@ -432,7 +432,7 @@
     }
 
     // create the input based on the supplied type
-    input = $(templates.inputs[options.inputType]);
+    $input = $(templates.inputs[options.inputType]);
 
     switch (options.inputType) {
       case "text":
@@ -440,9 +440,22 @@
       case "email":
       case "date":
       case "time":
-      case "number":
       case "password":
-        input.val(options.value);
+        $input.val(options.value);
+        break;
+
+      case "number":
+        inputOptions = options.inputOptions || [];
+        $input.val(options.value);
+        if(inputOptions.min) {
+          $input.attr("min", inputOptions.min);
+        }
+        if(inputOptions.max) {
+          $input.attr("max", inputOptions.max);
+        }
+        if(inputOptions.step) {
+          $input.attr("step", inputOptions.step);
+        }
         break;
 
       case "select":
@@ -460,7 +473,7 @@
         each(inputOptions, function(_, option) {
 
           // assume the element to attach to is the input...
-          var elem = input;
+          var elem = $input;
 
           if (option.value === undefined || option.text === undefined) {
             throw new Error("given options in wrong format");
@@ -481,11 +494,11 @@
         });
 
         each(groups, function(_, group) {
-          input.append(group);
+          $input.append(group);
         });
 
         // safe to set a select's value as per a normal input
-        input.val(options.value);
+        $input.val(options.value);
         break;
 
       case "checkbox":
@@ -503,7 +516,7 @@
         // checkboxes have to nest within a containing element, so
         // they break the rules a bit and we end up re-assigning
         // our 'input' element to this container instead
-        input = $("<div/>");
+        $input = $("<div/>");
 
         each(inputOptions, function(_, option) {
           var checkbox = $(templates.inputs[options.inputType]);
@@ -518,7 +531,7 @@
             }
           });
 
-          input.append(checkbox);
+          $input.append(checkbox);
         });
         break;
     }
@@ -526,19 +539,19 @@
     // @TODO provide an attributes option instead
     // and simply map that as keys: vals
     if (options.placeholder) {
-      input.attr("placeholder", options.placeholder);
+      $input.attr("placeholder", options.placeholder);
     }
 
     if (options.pattern) {
-      input.attr("pattern", options.pattern);
+      $input.attr("pattern", options.pattern);
     }
 
     if (options.maxlength) {
-      input.attr("maxlength", options.maxlength);
+      $input.attr("maxlength", options.maxlength);
     }
 
     // now place it in our form
-    form.append(input);
+    form.append($input);
 
     form.on("submit", function(e) {
       e.preventDefault();
@@ -558,7 +571,7 @@
     dialog.on("shown.bs.modal", function() {
       // need the closure here since input isn't
       // an object otherwise
-      input.focus();
+      $input.focus();
     });
 
     if (shouldShow === true) {

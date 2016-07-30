@@ -589,7 +589,20 @@ describe "bootbox.prompt", ->
 
         it "has correct placeholder value", ->
           expect(@find("input[type='number']").prop("placeholder")).to.equal "enter the number"
+      describe "Testing input type number attributes", ->
+        beforeEach ->
+          @options.inputOptions =
+            min: "10"
+            max: "500"
+            step: 30
+          @create()
 
+        it "has correct min val set", ->
+          expect(@find("input[type='number']").attr('min')).to.equal "10"
+        it "has correct max val set", ->
+          expect(@find("input[type='number']").attr('max')).to.equal "500"
+        it "has correct step set", ->
+          expect(@find("input[type='number']").attr('step')).to.equal "30"
   describe "callback tests", ->
     describe "with a simple callback", ->
       beforeEach ->
